@@ -20,6 +20,7 @@ function App() {
         >
           Start using Crowd!
         </a>
+        <button> Sign up! </button>
       </header>
     </div>
   );
