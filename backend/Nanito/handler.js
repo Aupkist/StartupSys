@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports.hello = async (event) => {
-  if (event.path === 'whoami' && event.httpMethod === "GET" ){
+  if (event.path === '/whoami' && event.httpMethod === "GET" ){
     return {
       statusCode: 200,
       body: JSON.stringify({

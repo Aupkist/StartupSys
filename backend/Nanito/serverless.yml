@@ -5,15 +5,17 @@
 # You can always add more config options for more control.
 # We've included some commented out config examples here.
 # Just uncomment any of them to get that config option.
-#
+# AKIAYCOIIUDF7S2GVFUQ
+
+# I+auyYnlyw6h3D/ACS6bDxoBOsB2QUIRtrRALYJF 
 # For full config options, check the docs:
 #    docs.serverless.com
 #
 # Happy Coding!
 
-service: nani
+service: nanito
 # app and org for use with dashboard.serverless.com
-app: nani
+app: nanito
 org: justlam
 
 # You can pin your service to only deploy with a specific Serverless version
