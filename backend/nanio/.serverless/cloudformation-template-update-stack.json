@@ -74,7 +74,7 @@
     "HelloLogGroup": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
-        "LogGroupName": "/aws/lambda/nanito-dev-hello"
+        "LogGroupName": "/aws/lambda/nanio-dev-hello"
       }
     },
     "IamRoleLambdaExecution": {
@@ -102,7 +102,7 @@
               "Fn::Join": [
                 "-",
                 [
-                  "nanito",
+                  "nanio",
                   "dev",
                   "lambda"
                 ]
@@ -119,7 +119,7 @@
                   ],
                   "Resource": [
                     {
-                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/nanito-dev*:*"
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/nanio-dev*:*"
                     }
                   ]
                 },
@@ -130,7 +130,7 @@
                   ],
                   "Resource": [
                     {
-                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/nanito-dev*:*:*"
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/nanio-dev*:*:*"
                     }
                   ]
                 }
@@ -143,7 +143,7 @@
           "Fn::Join": [
             "-",
             [
-              "nanito",
+              "nanio",
               "dev",
               {
                 "Ref": "AWS::Region"
@@ -207,11 +207,11 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/nanito/dev/1616111310927-2021-03-18T23:48:30.927Z/nanito.zip"
+          "S3Key": "serverless/nanio/dev/1616457305181-2021-03-22T23:55:05.181Z/nanio.zip"
         },
         "Handler": "s_hello.handler",
         "Runtime": "nodejs12.x",
-        "FunctionName": "nanito-dev-hello",
+        "FunctionName": "nanio-dev-hello",
         "MemorySize": 1024,
         "Timeout": 6,
         "Role": {
@@ -225,20 +225,20 @@
         "HelloLogGroup"
       ]
     },
-    "HelloLambdaVersion2VBMGyjr9IlhCLPn8xQVCkRz8huHR7Wrc6529v45cY": {
+    "HelloLambdaVersionJHHUbV5EYz65yKTVsT3zGAh0CAzxYfGEvd6vJ8Zhtio": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "HelloLambdaFunction"
         },
-        "CodeSha256": "lAteH/2ORhXHi6yjDkRhMvhaq6niwL4rKFGmppbQTBg="
+        "CodeSha256": "3/THNPq8+G2P/a/QMm1IvQ5AGsy+iL95KNweBdYQaoI="
       }
     },
     "ApiGatewayRestApi": {
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
-        "Name": "dev-nanito",
+        "Name": "dev-nanio",
         "EndpointConfiguration": {
           "Types": [
             "EDGE"
@@ -247,7 +247,7 @@
         "Policy": ""
       }
     },
-    "ApiGatewayResourceHello": {
+    "ApiGatewayResourceProxyVar": {
       "Type": "AWS::ApiGateway::Resource",
       "Properties": {
         "ParentId": {
@@ -256,19 +256,22 @@
             "RootResourceId"
           ]
         },
-        "PathPart": "hello",
+        "PathPart": "{proxy+}",
         "RestApiId": {
           "Ref": "ApiGatewayRestApi"
         }
       }
     },
-    "ApiGatewayMethodHelloPost": {
+    "ApiGatewayMethodAny": {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
-        "HttpMethod": "POST",
+        "HttpMethod": "ANY",
         "RequestParameters": {},
         "ResourceId": {
-          "Ref": "ApiGatewayResourceHello"
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
         },
         "RestApiId": {
           "Ref": "ApiGatewayRestApi"
@@ -305,7 +308,50 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1616111307538": {
+    "ApiGatewayMethodProxyVarAny": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "ANY",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceProxyVar"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "HelloLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      }
+    },
+    "ApiGatewayDeployment1616457301899": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -314,7 +360,8 @@
         "StageName": "dev"
       },
       "DependsOn": [
-        "ApiGatewayMethodHelloPost"
+        "ApiGatewayMethodAny",
+        "ApiGatewayMethodProxyVarAny"
       ]
     },
     "HelloLambdaPermissionApiGateway": {
@@ -357,7 +404,7 @@
     "ApiGatewayLogGroup": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
-        "LogGroupName": "/aws/api-gateway/nanito-dev"
+        "LogGroupName": "/aws/api-gateway/nanio-dev"
       }
     },
     "CustomApiGatewayAccountCloudWatchRole": {
@@ -398,7 +445,7 @@
                 "-",
                 [
                   "dev",
-                  "nanito",
+                  "nanio",
                   "custom-resources-lambda"
                 ]
               ]
@@ -463,9 +510,9 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/nanito/dev/1616111310927-2021-03-18T23:48:30.927Z/custom-resources.zip"
+          "S3Key": "serverless/nanio/dev/1616457305181-2021-03-22T23:55:05.181Z/custom-resources.zip"
         },
-        "FunctionName": "nanito-dev-custom-resource-apigw-cw-role",
+        "FunctionName": "nanio-dev-custom-resource-apigw-cw-role",
         "Handler": "apiGatewayCloudWatchRole/handler.handler",
         "MemorySize": 1024,
         "Runtime": "nodejs12.x",
@@ -484,7 +531,7 @@
     "CloudWatchLogsSubscriptionFilterHelloLogGroup": {
       "Type": "AWS::Logs::SubscriptionFilter",
       "Properties": {
-        "DestinationArn": "arn:aws:logs:us-east-1:802587217904:destination:5cb50bb4-cf20-4e42-bf5e-22743a9f2cd9#VM6f5vJmDGSYQwSV18#nanito#dev",
+        "DestinationArn": "arn:aws:logs:us-east-1:802587217904:destination:5cb50bb4-cf20-4e42-bf5e-22743a9f2cd9#356924q8wyztqJPJRr#nanio#dev",
         "FilterPattern": "?\"REPORT RequestId: \" ?\"SERVERLESS_ENTERPRISE\"",
         "LogGroupName": {
           "Ref": "HelloLogGroup"
@@ -494,7 +541,7 @@
     "CloudWatchLogsSubscriptionFilterApiGatewayLogGroup": {
       "Type": "AWS::Logs::SubscriptionFilter",
       "Properties": {
-        "DestinationArn": "arn:aws:logs:us-east-1:802587217904:destination:5cb50bb4-cf20-4e42-bf5e-22743a9f2cd9#VM6f5vJmDGSYQwSV18#nanito#dev",
+        "DestinationArn": "arn:aws:logs:us-east-1:802587217904:destination:5cb50bb4-cf20-4e42-bf5e-22743a9f2cd9#356924q8wyztqJPJRr#nanio#dev",
         "FilterPattern": "\"SLS_ACCESS_LOG\"",
         "LogGroupName": {
           "Ref": "ApiGatewayLogGroup"
@@ -519,7 +566,7 @@
     "HelloLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "HelloLambdaVersion2VBMGyjr9IlhCLPn8xQVCkRz8huHR7Wrc6529v45cY"
+        "Ref": "HelloLambdaVersionJHHUbV5EYz65yKTVsT3zGAh0CAzxYfGEvd6vJ8Zhtio"
       }
     },
     "ServiceEndpoint": {
