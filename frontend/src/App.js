@@ -65,6 +65,7 @@ class SignInScreen extends React.Component {
       <div>
         <h1>Crowd</h1>
         <p>Welcome {firebase.auth().currentUser.displayName}! You are now signed-in!</p>
+        <p> E-mail: {firebase.auth().currentUser.email}   </p>
         <a onClick={() => firebase.auth().signOut()}>Sign-out</a>
       </div>
     );
