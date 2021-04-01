@@ -25,6 +25,9 @@ provider:
   runtime: nodejs12.x
   lambdaHashingVersion: 20201221
 
+# plugins:
+#   - serverless-offline
+
 # you can overwrite defaults here
 #  stage: dev
 #  region: us-east-1
@@ -68,6 +71,20 @@ functions:
       - http:
           path: /{proxy+}
           method: ANY
+
+  feedApi:
+    handler: handler.feed
+    events:
+      - http:
+          path: /feed
+          method: GET
+          
+  ordersApi:
+    handler: handler.orders
+    events:
+      - http:
+          path: /orders
+          method: GET
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

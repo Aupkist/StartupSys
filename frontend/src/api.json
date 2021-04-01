@@ -1,0 +1,6 @@
+{
+  "id": "order-id",
+  "status": "in-progress",
+  "total": "$50",
+  "menuItems": [{ "name": "fried chicken", "quantity": 2 }]
+}

@@ -16,7 +16,25 @@ var firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+//var config = require('./api.json');
+class Orders extends React.Component {
+  state = {
+    orders: null
+  }
 
+  async componentDidMount() {
+    const response = await fetch('https://oymckezqe4.execute-api.us-east-1.amazonaws.com/dev/orders')
+    const orders = await response.json()
+    // save it to your components state so you can use it during render
+    this.setState({orders: orders})
+    //console.log(orders)
+  }
+  render() {
+
+      return null;
+  }
+    
+}
  
 class SignInScreen extends React.Component {
  
@@ -67,6 +85,22 @@ class SignInScreen extends React.Component {
         <p>Welcome {firebase.auth().currentUser.displayName}! You are now signed-in!</p>
         <p> E-mail: {firebase.auth().currentUser.email}   </p>
         <a onClick={() => firebase.auth().signOut()}>Sign-out</a>
+      
+        <div>
+          <div className="title">My Orders</div>
+          <ul>
+          {
+            this.state.orders && this.state.orders.map(order => {
+              return (
+                <li>
+                  <div>Order ID: {order.id}</div>
+                  <div>Order status: {order.status}</div>
+                </li>
+              )
+            })
+          }
+          </ul>
+        </div>
       </div>
     );
   }
@@ -83,6 +117,7 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <SignInScreen />
+        <Orders />
         <p>
           About
         </p>
