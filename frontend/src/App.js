@@ -23,15 +23,55 @@ class Orders extends React.Component {
   }
 
   async componentDidMount() {
-    const response = await fetch('https://oymckezqe4.execute-api.us-east-1.amazonaws.com/dev/orders')
+    // const response = await fetch('http://localhost:4000/dev/orders')
+    // const response = await fetch('https:oymckezqe4.execute-api.us-east-1.amazonaws.com/dev/orders')
+    // const orders = await response.json()
+    // save it to your components state so you can use it during render
+    // this.setState({orders: orders})
+    // console.log(orders)
+    const idToken = await firebase.auth().currentuser?.getIdToken()
+    const response = await fetch('http://localhost:4000/dev/orders', {
+      headers: {
+        'Authorization': idToken
+      }
+    })
+    if (response.status === 401) {
+      return console.log('unauthorized')
+    }
     const orders = await response.json()
     // save it to your components state so you can use it during render
     this.setState({orders: orders})
-    //console.log(orders)
+    console.log("wtf",orders)
   }
   render() {
-
-      return null;
+    return (
+      
+                
+    <div>
+    {console.log("PLEASE", this.state.orders)}
+    <div className="title">My Orders</div>
+    
+      <ul>
+      
+      {
+        
+        this.state.orders && this.state.orders.map((orders,index) =>  {
+          
+          return (
+            <li key={index}>
+              <div>
+                <p class = "title is-4">Order ID: {orders.id}</p>
+                <p class = "subtitle is-6">Order status: {orders.status}</p>
+              </div>
+            </li>
+          )
+        })
+        
+      }
+      
+    </ul>
+  </div>
+    )  
   }
     
 }
@@ -42,7 +82,7 @@ class SignInScreen extends React.Component {
   state = {
     isSignedIn: false // Local signed-in state.
   };
- 
+  
   // Configure FirebaseUI.
   uiConfig = {
     // Popup signin flow rather than redirect flow.
@@ -85,22 +125,8 @@ class SignInScreen extends React.Component {
         <p>Welcome {firebase.auth().currentUser.displayName}! You are now signed-in!</p>
         <p> E-mail: {firebase.auth().currentUser.email}   </p>
         <a onClick={() => firebase.auth().signOut()}>Sign-out</a>
-      
-        <div>
-          <div className="title">My Orders</div>
-          <ul>
-          {
-            this.state.orders && this.state.orders.map(order => {
-              return (
-                <li>
-                  <div>Order ID: {order.id}</div>
-                  <div>Order status: {order.status}</div>
-                </li>
-              )
-            })
-          }
-          </ul>
-        </div>
+        <Orders />
+
       </div>
     );
   }
@@ -116,8 +142,9 @@ function App() {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
+        
         <SignInScreen />
-        <Orders />
+        
         <p>
           About
         </p>

@@ -49,10 +49,30 @@ module.exports.feed = async (event) => {
 module.exports.orders = async (event) => {
 
   if (event.path === '/orders' && event.httpMethod === "GET" ){
+    const token = event.headers['Authorization']
+    // If no token is provided, or it is "", return a 401
+    if (!token) {
+      return {
+        statusCode: 401
+      }
+    }
+
+    try {
+      // validate the token from the request
+      const decoded = await firebaseTokenVerifier.validate(token, projectId)
+    } catch (err) {
+      // the token was invalid,
+      console.error(err)
+      return {
+        statusCode: 401
+      }
+    }
+
     return {
       statusCode: 200,
       body: JSON.stringify(
-        [{id: 'order-id', status: 'in-progress', total: '$50',menuItems: [{ name: 'fried chicken', quantity: 2 }]}]
+        [{id: 'order-id', status: 'in-progress', total: '$50',menuItems: [{ name: 'fried chicken', quantity: 2 }]},
+        {id: '3', status: 'in-progress', total: '$10',menuItems: [{ name: 'veg', quantity: 1 }]}]
       )
     }
   }
