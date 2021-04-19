@@ -29,7 +29,7 @@ class Orders extends React.Component {
     // save it to your components state so you can use it during render
     // this.setState({orders: orders})
     // console.log(orders)
-    const idToken = await firebase.auth().currentuser?.getIdToken()
+    const idToken = await firebase.auth().currentUser?.getIdToken()
     const response = await fetch('http://localhost:4000/dev/orders', {
       headers: {
         'Authorization': idToken

@@ -1,5 +1,6 @@
 'use strict';
-
+const firebaseTokenVerifier = require('firebase-token-verifier')
+const projectId = "nanio-4c0b0"
 module.exports.hello = async (event) => {
   if (event.path === '/whoami' && event.httpMethod === "GET" ){
     return {
