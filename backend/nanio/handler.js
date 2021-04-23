@@ -1,10 +1,21 @@
 'use strict';
 const firebaseTokenVerifier = require('firebase-token-verifier')
 const projectId = "nanio-4c0b0"
+const headers = {
+  'Access-Control-Allow-Origin': '*'
+}
 module.exports.hello = async (event) => {
+  if (event.httpMethod === 'OPTIONS') {
+    // return the expected status and CORS headers
+    return {
+        statusCode: 200,
+        headers
+    }
+}
   if (event.path === '/whoami' && event.httpMethod === "GET" ){
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify({
         username: 'cl2634'
       })
@@ -13,6 +24,7 @@ module.exports.hello = async (event) => {
   if (event.path === '/feed' && event.httpMethod === "GET" ){
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify(
         [{username: 'da335', message: 'building stuff is cool'}]
       )
@@ -20,6 +32,7 @@ module.exports.hello = async (event) => {
   }
   return {
     statusCode: 200,
+    headers,
     body: JSON.stringify(
       {
         message: 'Go Serverless v1.0! Your function executed successfully!',
@@ -35,10 +48,17 @@ module.exports.hello = async (event) => {
 };
 
 module.exports.feed = async (event) => {
-
+  if (event.httpMethod === 'OPTIONS') {
+    // return the expected status and CORS headers
+    return {
+        statusCode: 200,
+        headers
+    }
+}
   if (event.path === '/feed' && event.httpMethod === "GET" ){
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify(
         [{username: 'cl2634', message: 'building stuff is cool'}]
       )
@@ -48,13 +68,20 @@ module.exports.feed = async (event) => {
 };
 
 module.exports.orders = async (event) => {
-
+  if (event.httpMethod === 'OPTIONS') {
+    // return the expected status and CORS headers
+    return {
+        statusCode: 200,
+        headers
+    }
+}
   if (event.path === '/orders' && event.httpMethod === "GET" ){
     const token = event.headers['Authorization']
     // If no token is provided, or it is "", return a 401
     if (!token) {
       return {
-        statusCode: 401
+        statusCode: 401,
+        headers
       }
     }
 
@@ -65,12 +92,14 @@ module.exports.orders = async (event) => {
       // the token was invalid,
       console.error(err)
       return {
-        statusCode: 401
+        statusCode: 401,
+        headers
       }
     }
 
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify(
         [{id: 'order-id', status: 'in-progress', total: '$50',menuItems: [{ name: 'fried chicken', quantity: 2 }]},
         {id: '3', status: 'in-progress', total: '$10',menuItems: [{ name: 'veg', quantity: 1 }]}]

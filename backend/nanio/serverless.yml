@@ -85,6 +85,7 @@ functions:
       - http:
           path: /orders
           method: GET
+          cors: true
 plugins:
   - serverless-offline
 #    The following are a few example events you can configure

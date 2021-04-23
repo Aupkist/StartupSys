@@ -24,7 +24,7 @@ class Orders extends React.Component {
 
   async componentDidMount() {
     // const response = await fetch('http://localhost:4000/dev/orders')
-    // const response = await fetch('https:oymckezqe4.execute-api.us-east-1.amazonaws.com/dev/orders')
+    // const response = await fetch('https://oymckezqe4.execute-api.us-east-1.amazonaws.com/dev/orders')
     // const orders = await response.json()
     // save it to your components state so you can use it during render
     // this.setState({orders: orders})
