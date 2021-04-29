@@ -4,6 +4,60 @@ const projectId = "nanio-4c0b0"
 const headers = {
   'Access-Control-Allow-Origin': '*'
 }
+const AWS = require("aws-sdk");
+const { v4: uuidv4 } = require("uuid");
+const docClient = new AWS.DynamoDB.DocumentClient({ region: "us-east-1" });
+
+// const getRestaurants = (zipCode) => {  
+//   return docClient    
+//   .query({
+//     TableName: "cs5356-restaurants",
+//     KeyConditionExpression: "zipCode = :zipCode",
+//     ExpressionAttributeValues: {
+//       ":zipCode": zipCode,      
+//       },
+//     })
+//     .promise()
+//     .then((results) => results.Items);
+// };
+// const addRestaurant = (restaurant) => {
+// return docClient
+// .put({
+//     TableName: "cs5356-restaurants",
+//     Item: {        
+//       zipCode: restaurant.zipCode,        
+//       restaurantId: restaurant.name,        
+//       menu: restaurant.menu,      
+//     },    
+//   })    
+//   .promise();};
+
+// const placeOrder = (userKey, orderDetails) => {
+//   return docClient
+//   .put({
+//     TableName: "cs5356-restaurants",      
+//     Item: {        
+//       userKey: userKey,        
+//       orderId: uuidv4(),        
+//       total: orderDetails.total,        
+//       items: orderDetails.items      
+//     },    
+//   })    
+//   .promise();
+// };
+
+//   const getOrders = (userKey) => {  
+//     return docClient    
+//     .query({      
+//       TableName: "cs5356-restaurants",      
+//       KeyConditionExpression: "user_key = :user_key",      
+//       ExpressionAttributeValues: {        
+//         ":user_key": userKey,      
+//       },    
+//     })    
+//     .promise()    
+//     .then((results) => results.Items);
+// };
 module.exports.hello = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
     // return the expected status and CORS headers
@@ -66,7 +120,14 @@ module.exports.feed = async (event) => {
   }
 
 };
-
+const checkUser = async (event) => {
+  const token = event.headers['Authorization']
+    if (!token) {
+      throw new Error('Missing token')
+    }
+    const decodedUser = await firebaseTokenVerifier.validate(token, projectId)
+    return decodedUser
+}
 module.exports.orders = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
     // return the expected status and CORS headers
@@ -75,6 +136,7 @@ module.exports.orders = async (event) => {
         headers
     }
 }
+
   if (event.path === '/orders' && event.httpMethod === "GET" ){
     const token = event.headers['Authorization']
     // If no token is provided, or it is "", return a 401
@@ -84,10 +146,10 @@ module.exports.orders = async (event) => {
         headers
       }
     }
-
+    let user
     try {
       // validate the token from the request
-      const decoded = await firebaseTokenVerifier.validate(token, projectId)
+      user = await firebaseTokenVerifier.validate(token, projectId)
     } catch (err) {
       // the token was invalid,
       console.error(err)
@@ -96,15 +158,69 @@ module.exports.orders = async (event) => {
         headers
       }
     }
-
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify(
-        [{id: 'order-id', status: 'in-progress', total: '$50',menuItems: [{ name: 'fried chicken', quantity: 2 }]},
-        {id: '3', status: 'in-progress', total: '$10',menuItems: [{ name: 'veg', quantity: 1 }]}]
-      )
+    const results = await docClient.query({
+      TableName: 'cs5356-restaurants',
+          KeyConditionExpression: 'userKey = :userKey',
+          ExpressionAttributeValues: {
+            ':userKey': user.sub,
+      }
+      }).promise()
+  
+    //return that data
+      return {
+        statusCode: 201,
+          headers,
+      body: JSON.stringify(results)
+    // return {
+    //   statusCode: 200,
+    //   headers,
+    //   body: JSON.stringify(
+    //     [{id: 'order-id', status: 'in-progress', total: '$50',menuItems: [{ name: 'fried chicken', quantity: 2 }]},
+    //     {id: '3', status: 'in-progress', total: '$10',menuItems: [{ name: 'veg', quantity: 1 }]}]
+    //   )
+     }
+  }
+  if (event.path === '/orders' && event.httpMethod === 'POST') {
+    // check if the user is authenticated
+	let user;
+    try {
+      user = await checkUser(event)
+    } catch (err) {
+      return {
+        statusCode: 401,
+        headers,
+        body: JSON.stringify({message: err.message})
+      }
     }
+
+    // check that the request contains a body
+    if (!event.body) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({message: 'Missing body'})
+      }
+    }
+
+    // parse the request body as JSON
+    const requestBody = JSON.parse(event.body);
+
+    // TODO write that data to your dynamodb table
+    await docClient.put({
+      TableName: 'cs5356-restaurants',
+        Item: {
+          orderId: uuidv4(),
+          userKey: user.sub,
+          Quantity: requestBody.Quantity,
+          Item: requestBody.Item
+      }
+    }).promise()
+    return {
+      statusCode: 201,
+        headers,
+	// send back a successful response
+
+	  }
   }
 
 };
