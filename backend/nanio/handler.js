@@ -182,6 +182,7 @@ module.exports.orders = async (event) => {
   }
   if (event.path === '/orders' && event.httpMethod === 'POST') {
     // check if the user is authenticated
+    const token = event.headers['Authorization']
 	let user;
     try {
       user = await checkUser(event)

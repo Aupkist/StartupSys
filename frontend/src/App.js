@@ -30,8 +30,8 @@ class Orders extends React.Component {
     // this.setState({orders: orders})
     // console.log(orders)
     const idToken = await firebase.auth().currentUser?.getIdToken()
-    const response = await fetch('http://localhost:4000/dev/orders', {
-    //const response = await fetch('https://oymckezqe4.execute-api.us-east-1.amazonaws.com/dev/orders', {
+    //const response = await fetch('http://localhost:4000/dev/orders', {
+    const response = await fetch('https://oymckezqe4.execute-api.us-east-1.amazonaws.com/dev/orders', {
       headers: {
         'Authorization': idToken
       }
@@ -85,7 +85,8 @@ class SignedInComponent extends React.Component {
 
 	async fetchOrders() {
     const token = await firebase.auth().currentUser?.getIdToken()
-		const results = await fetch('http://localhost:4000/dev/orders', {
+    const results = await fetch('https://oymckezqe4.execute-api.us-east-1.amazonaws.com/dev/orders', {
+		//const results = await fetch('http://localhost:4000/dev/orders', {
 			headers: {
 				'Authorization': token
 			}
@@ -110,7 +111,8 @@ class SignedInComponent extends React.Component {
 		const token = await firebase.auth().currentUser?.getIdToken()
 
 		// Make a POST request to your new API
-		const response = await fetch('http://localhost:4000/dev/orders', {
+    const response = await fetch('https://oymckezqe4.execute-api.us-east-1.amazonaws.com/dev/orders', {
+		//const response = await fetch('http://localhost:4000/dev/orders', {
 			method: 'POST',
 			headers: {
 				'Authorization': token
